@@ -16,5 +16,4 @@ Download executable file from [here](https://github.com/tortoiselala/web-server/
 
 ![settings](https://raw.githubusercontent.com/tortoiselala/web-server/master/img/Screenshot-setting.png)
 
-
-ss://YWVzLTI1Ni1jZmI6dG9ydG9pc2VsYWxhQDU0LjE3OS4xNzMuMjE3OjEzMDIy
+ pacman -Rsn gnome-2048 aisleriot atomix gnome-chess five-or-more hitori iagno gnome-klotski lightsoff gnome-mahjongg gnome-mines gnome-nibbles quadrapassel four-in-a-row gnome-robots gnome-sudoku swell-foop tali gnome-taquin gnome-tetravex
