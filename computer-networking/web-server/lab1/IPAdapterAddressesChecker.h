@@ -5,9 +5,9 @@ using namespace std;
 #ifndef IP_ADAPTER_ADDRESSES_CHECKER
 #define IP_ADAPTER_ADDRESSES_CHECKER
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
+#include <winsock2.h> // for IN_ADDR, 
 #include <ws2tcpip.h>
-#include <iphlpapi.h>
+#include <iphlpapi.h> //for PMIB_IPADDRTABLE, GetIpAddrTable
 #include <stdio.h>
 
 #pragma comment(lib, "iphlpapi.lib")
