@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tortoiselala.mapper.RegistrationMapper">
+    <resultMap id="registrationMap" type="com.tortoiselala.entity.Registration">
+        <id column="GHBH" property="ID" javaType="string" jdbcType="CHAR"/>
+        <result column="HZBH" property="registrationID" javaType="string"/>
+        <result column="YSBH" property="doctorID"/>
+        <result column="BRBH" property="patientID"/>
+        <result column="GHRC" property="totalNumberOfRegistered"/>
+        <result column="THBZ" property="cancel" javaType="boolean"/>
+        <result column="GHFY" property="fee"/>
+        <result column="RQSJ" property="date"/>
+    </resultMap>
+
+    <select id="getRegisterNumberByID" parameterType="string" resultType="string">
+        SELECT HZBH FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getDoctorIDByID" parameterType="string" resultType="string">
+        SELECT YSBH FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getPatientIDByID" parameterType="string" resultType="string">
+        SELECT BRBH FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getNumberOfRegistered" parameterType="string" resultType="int">
+        SELECT GHRC FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getStatus" parameterType="string" resultType="boolean">
+        SELECT THBZ FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getFee" parameterType="string" resultType="double">
+        SELECT GHFY FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getDate" parameterType="string" resultType="java.util.Date">
+        SELECT RQSJ FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getByID" parameterType="string"
+            resultMap="registrationMap">
+        SELECT GHBH, HZBH, YSBH, BRBH, GHRC, THBZ, GHFY, RQSJ FROM T_GHXX WHERE GHBH LIKE #{ID}
+    </select>
+
+    <select id="getAll" resultType="java.util.List" resultMap="registrationMap">
+        SELECT GHBH, HZBH, YSBH, BRBH, GHRC, THBZ, GHFY, RQSJ FROM T_GHXX
+    </select>
+
+    <select id="getNextNum" resultType="string">
+        SELECT MAX(GHBH) FROM T_GHXX
+    </select>
+
+    <insert id="insertNewItem" parameterType="com.tortoiselala.entity.Registration">
+        INSERT T_GHXX(GHBH, HZBH, YSBH, BRBH, GHRC, THBZ, GHFY, RQSJ)
+        VALUES (#{ID}, #{registrationID}, #{doctorID}, #{patientID}, #{totalNumberOfRegistered}, #{cancel}, #{fee}, #{date})
+    </insert>
+</mapper>

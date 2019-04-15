@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan
+            base-package="com.tortoiselala.controller" />
+    <mvc:default-servlet-handler />
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/static/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven/>
+
+    <!-- 持久层对象 -->
+    <bean id="userDao" class="com.tortoiselala.dao.impl.UserDao"/>
+    <bean id="doctorDao" class="com.tortoiselala.dao.impl.DoctorDao"/>
+    <bean id="patientDao" class="com.tortoiselala.dao.impl.PatientDao"/>
+    <bean id="registrationDao" class="com.tortoiselala.dao.impl.RegistrationDao"/>
+    <bean id="departmentDao" class="com.tortoiselala.dao.impl.DepartmentDao"/>
+    <bean id="regInfoDao" class="com.tortoiselala.dao.impl.RegInfoDao"/>
+    <!-- service对象 -->
+    <bean id="userService" class="com.tortoiselala.service.impl.UserService"/>
+    <bean id="doctorService" class="com.tortoiselala.service.impl.DoctorService"/>
+    <bean id="departmentService" class="com.tortoiselala.service.impl.DepartmentService"/>
+    <bean id="regInfoService" class="com.tortoiselala.service.impl.RegInfoService"/>
+    <bean id="patientService" class="com.tortoiselala.service.impl.PatientService"/>
+    <bean id="registrationService" class="com.tortoiselala.service.impl.RegistrationService"/>
+    <!-- 统计医生收入 -->
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean id="authInterceptor"
+                  class="com.tortoiselala.interceptor.AuthInterceptor"/> <!--这个类就是我们自定义的Interceptor -->
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>

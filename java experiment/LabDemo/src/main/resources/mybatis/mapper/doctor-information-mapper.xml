@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tortoiselala.mapper.DoctorMapper">
+    <resultMap id="doctorMap" type="com.tortoiselala.entity.Doctor">
+        <id column="YSBH" property="doctorID" javaType="string" jdbcType="CHAR"/>
+        <result column="KSBH" property="departmentID"/>
+        <result column="YSMC" property="doctorName"/>
+        <result column="PYZS" property="doctorPinyinPrefix"/>
+        <result column="DLKL" property="doctorPassword"/>
+        <result column="SFZJ" property="expert" javaType="boolean"/>
+        <result column="DLRQ" property="doctorLastLoginDate"/>
+    </resultMap>
+
+    <resultMap id="patientUnitForShowMap" type="com.tortoiselala.entity.PatientUnitForShow">
+        <result column="GHBH" property="registrationID"/>
+        <result column="BRMC" property="patientName"/>
+        <result column="RQSJ" property="date"/>
+    </resultMap>
+
+    <select id="getDepartmentIDByDoctorID" parameterType="string" resultType="string">
+        SELECT KSBH FROM T_KSYS WHERE YSBH LIKE #{doctorID}
+    </select>
+
+    <select id="getNameByDoctorID" parameterType="string" resultType="string">
+        SELECT YSMC FROM T_KSYS WHERE YSBH LIKE #{doctorID}
+    </select>
+
+    <select id="getPasswordByDoctorID" parameterType="string" resultType="string">
+        SELECT DLKL FROM T_KSYS WHERE YSBH LIKE #{doctorID}
+    </select>
+
+    <select id="getTypeByDoctorID" parameterType="string" resultType="boolean">
+        SELECT SFZJ FROM T_KSYS WHERE YSBH LIKE #{doctorID}
+    </select>
+
+    <select id="getDoctorByDoctorID" parameterType="string" resultType="com.tortoiselala.entity.Doctor"
+            resultMap="doctorMap">
+        SELECT YSBH, KSBH, YSMC, PYZS, DLKL, SFZJ, DLRQ FROM T_KSYS WHERE YSBH LIKE #{doctorID}
+    </select>
+
+    <select id="getDoctorList" resultType="java.util.List" resultMap="doctorMap">
+        SELECT YSBH, KSBH, YSMC, PYZS, DLKL, SFZJ, DLRQ FROM T_KSYS
+    </select>
+
+    <select id="updateLastLoginDate" parameterType="hashmap">
+        UPDATE T_KSYS SET DLRQ=#{LAST_VISITED} WHERE YSBH LIKE #{USER_ID}
+    </select>
+
+    <select id="getRegistrationInformation" parameterType="string" resultType="java.util.List" resultMap="patientUnitForShowMap">
+          SELECT registrationTable.GHBH AS GHBH, patientTable.BRMC AS BRMC, registrationTable.RQSJ AS RQSJ FROM
+            (SELECT GHBH, HZBH, YSBH, BRBH, THBZ, RQSJ FROM T_GHXX WHERE YSBH LIKE #{doctorID}) AS registrationTable,
+            (SELECT BRBH, BRMC FROM T_BRXX) AS patientTable
+    WHERE registrationTable.BRBH LIKE patientTable.BRBH AND registrationTable.THBZ = 0
+    </select>
+</mapper>

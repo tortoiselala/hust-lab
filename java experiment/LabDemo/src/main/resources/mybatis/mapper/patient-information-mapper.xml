@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tortoiselala.mapper.PatientMapper">
+    <resultMap id="patientMap" type="com.tortoiselala.entity.Patient">
+        <id column="BRBH" property="ID" javaType="string" jdbcType="CHAR"/>
+        <result column="BRMC" property="name"/>
+        <result column="DLKL" property="password"/>
+        <result column="YCJE" property="chargeBalance"/>
+        <result column="DLRQ" property="lastLoginDate"/>
+    </resultMap>
+
+    <select id="getNameByPatientID" parameterType="string" resultType="string">
+        SELECT BRMC FROM T_BRXX WHERE BRBH LIKE #{doctorID}
+    </select>
+
+    <select id="getPasswordByPatientID" parameterType="string" resultType="string">
+        SELECT DLKL FROM T_BRXX WHERE BRBH LIKE #{doctorID}
+    </select>
+
+    <select id="getChargeBalance" parameterType="string" resultType="double">
+        SELECT YCJE FROM T_BRXX WHERE BRBH LIKE #{doctorID}
+    </select>
+
+    <select id="getLastLoginDate" parameterType="string" resultType="java.util.Date">
+        SELECT DLRQ FROM T_BRXX WHERE BRBH LIKE #{doctorID}
+    </select>
+
+    <select id="getByPatientID" parameterType="string" resultType="com.tortoiselala.entity.Patient" resultMap="patientMap">
+        SELECT BRBH, BRMC, DLKL, YCJE, DLRQ FROM T_BRXX WHERE BRBH LIKE #{doctorID}
+    </select>
+
+    <select id="getAll" resultType="java.util.List" resultMap="patientMap">
+        SELECT BRBH, BRMC, DLKL, YCJE, DLRQ FROM T_BRXX
+    </select>
+
+    <select id="updateLastLoginDate" parameterType="hashmap">
+        UPDATE T_BRXX SET DLRQ=#{LAST_VISITED} WHERE BRBH LIKE #{USER_ID}
+    </select>
+
+    <select id="updateChargeFee" parameterType="hashmap">
+        UPDATE T_BRXX SET YCJE=#{NEW_VALUE} WHERE BRBH LIKE #{USER_ID}
+    </select>
+</mapper>

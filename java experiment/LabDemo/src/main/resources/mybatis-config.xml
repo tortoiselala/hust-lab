@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <properties resource="jdbc.properties">
+        <property name="driver" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/HOSPITAL"/>
+        <property name="username" value="root"/>
+        <property name="password" value="88888888"/>
+    </properties>
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+    <!-- define an alias -->
+    <typeAliases>
+<!--        <typeAlias alias="" type=""/>-->
+        <package name="com.tortoiselala.entity"/>
+    </typeAliases>
+    <!-- define database information, default=development -->
+    <environments default="development">
+        <environment id="development">
+            <!-- using JDBC transaction management -->
+            <transactionManager type="JDBC"/>
+            <!-- database connection information -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- define mapper -->
+    <mappers>
+        <mapper resource="mybatis/mapper/department-information-mapper.xml"/>
+        <mapper resource="mybatis/mapper/doctor-information-mapper.xml"/>
+        <mapper resource="mybatis/mapper/patient-information-mapper.xml"/>
+        <mapper resource="mybatis/mapper/registration-information-mapper.xml"/>
+        <mapper resource="mybatis/mapper/reg-info-mapper.xml"/>
+    </mappers>
+
+
+</configuration>

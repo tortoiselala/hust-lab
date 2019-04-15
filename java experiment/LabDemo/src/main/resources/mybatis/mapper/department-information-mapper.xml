@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    mapper for department information
+
+
+-->
+<mapper namespace="com.tortoiselala.mapper.DepartmentMapper">
+    <resultMap id="departmentMap" type="com.tortoiselala.entity.Department">
+        <id column="KSBH" property="departmentID" javaType="String" jdbcType="CHAR"/>
+        <result column="KSMC" property="departmentName"/>
+        <result column="PYZS" property="departmentPinyinPrefix"/>
+    </resultMap>
+    <select id="getDepartmentNameByDepartmentID" parameterType="string" resultType="string">
+        SELECT KSMC FROM T_KSXX WHERE KSBH like #{departmentID}
+    </select>
+    <select id="getDepartmentPinyinByDepartmentID" parameterType="string" resultType="string">
+        SELECT PYZS FROM T_KSXX WHERE KSBH LIKE #{departmentID}
+    </select>
+    <select id="getDepartmentByDepartmentID" parameterType="string" resultType="Department" resultMap="departmentMap">
+        SELECT KSBH, KSMC, PYZS FROM T_KSXX WHERE KSBH like #{departmentID}
+    </select>
+    <select id="getDepartmentList" resultType="java.util.List" resultMap="departmentMap">
+        SELECT KSBH, KSMC, PYZS FROM T_KSXX
+    </select>
+</mapper>

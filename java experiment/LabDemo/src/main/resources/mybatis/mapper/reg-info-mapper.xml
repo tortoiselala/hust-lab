@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tortoiselala.mapper.RegInfoMapper">
+    <resultMap id="regInfoMap" type="com.tortoiselala.entity.RegInfo">
+        <result column="HZBH" property="ID"/>
+        <result column="HZMC" property="name"/>
+        <result column="PYZS" property="pinyinPrefix"/>
+        <result column="KSBH" property="departmentID"/>
+        <result column="SFZJ" property="expert" javaType="boolean"/>
+        <result column="GHRS" property="maxNumberOfPeople"/>
+        <result column="GHFY" property="regFee"/>
+    </resultMap>
+
+    <select id="getNameByID" parameterType="string" resultType="string">
+        SELECT HZMC FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+
+    <select id="getPinyinByID" parameterType="string" resultType="string">
+        SELECT PYZS FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+    
+    <select id="getDepartmentIDByID" parameterType="string" resultType="string">
+        SELECT KSBH FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+
+    <select id="isExpert" parameterType="string" resultType="boolean">
+        SELECT SFZJ FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+
+    <select id="getMaxNumberByID" parameterType="string" resultType="int">
+        SELECT GHRS FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+    
+    <select id="getFeeByID" parameterType="string" resultType="double">
+        SELECT GHFY FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+
+    <select id="getByID" parameterType="string" resultType="com.tortoiselala.entity.RegInfo" resultMap="regInfoMap">
+        SELECT HZBH, HZMC, PYZS, KSBH, SFZJ, GHRS, GHFY FROM T_HZXX WHERE HZBH LIKE #{ID}
+    </select>
+
+    <select id="getAll" parameterType="string" resultType="java.util.List" resultMap="regInfoMap">
+        SELECT HZBH, HZMC, PYZS, KSBH, SFZJ, GHRS, GHFY FROM T_HZXX
+    </select>
+
+    <update id="updateRegistrationNum">
+        UPDATE T_HZXX SET GHRS = #{param1} WHERE HZBH LIKE #{param2}
+    </update>
+</mapper>
