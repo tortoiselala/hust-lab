@@ -185,40 +185,157 @@ make
 
 该部分实验需要完成函数`transpose_submit`函数以利用时间局部性和空间局部性来减少cache miss数。
 
-在32×32的矩阵中，将矩阵转置分为8×8的四个小矩阵转置，代码如下：
+在32×32的矩阵中，如果采用原矩阵进行转置，第一行转置的写入操作会发生24次eviction，此后每一行的转置对应的写入都会发生32次eviction，加上两个矩阵同一行冲突以及读取时发生的冲突，一共会发生1184次cache miss。
+$$
+\begin{bmatrix}
+A & B\\
+C & D\\
+\end{bmatrix}
+^T
+=
+\begin{bmatrix}
+A^T & B^T\\
+C^T & D^T\\
+\end{bmatrix}
+$$
+由于上述表达式的存在，可以将大矩阵转置通过小矩阵转置来实现，从而充分利用时间局部性与空间局部性。
+
+可以尝试不同的分法，分别测试其最终能够达到的分数，选取最优即可。
+
+对于64×64的矩阵与61×67的矩阵，同样测试不同情况下矩阵的划分，选取最优即可。
+
+最终实现的代码如下所示：
 
 ```c
-for (a = 0; a < N; a += 8) {  
-    for (b = 0; b < M; b += 8) {  
-        for (c = a; c < a + 8; ++c) {  
-            reg0 = A[c][b + 0];  
-            reg1 = A[c][b + 1];  
-            reg2 = A[c][b + 2];  
-            reg3 = A[c][b + 3];  
-            reg4 = A[c][b + 4];  
-            reg5 = A[c][b + 5];  
-            reg6 = A[c][b + 6];  
-            reg7 = A[c][b + 7];  
-            B[b + 0][c] = reg0;  
-            B[b + 1][c] = reg1;  
-            B[b + 2][c] = reg2;  
-            B[b + 3][c] = reg3;  
-            B[b + 4][c] = reg4;  
-            B[b + 5][c] = reg5;  
-            B[b + 6][c] = reg6;  
-            B[b + 7][c] = reg7;  
-        }  
-    }  
-}  
+void transpose_submit(int M, int N, int A[N][M], int B[M][N])
+{  int a, b, c, d;
+    int reg0, reg1, reg2, reg3, reg4, reg5, reg6, reg7;
+    if (M == 32 && N == 32) {
+        for (a = 0; a < N; a += 8) {
+            for (b = 0; b < M; b += 8) {
+                for (c = a; c < a + 8; ++c) {
+                    reg0 = A[c][b + 0];
+                    reg1 = A[c][b + 1];
+                    reg2 = A[c][b + 2];
+                    reg3 = A[c][b + 3];
+                    reg4 = A[c][b + 4];
+                    reg5 = A[c][b + 5];
+                    reg6 = A[c][b + 6];
+                    reg7 = A[c][b + 7];
+                    B[b + 0][c] = reg0;
+                    B[b + 1][c] = reg1;
+                    B[b + 2][c] = reg2;
+                    B[b + 3][c] = reg3;
+                    B[b + 4][c] = reg4;
+                    B[b + 5][c] = reg5;
+                    B[b + 6][c] = reg6;
+                    B[b + 7][c] = reg7;
+                }
+            }
+        }
+    } else if (M == 64 && N == 64) {
+        for (a = 0; a < N; a += 8) {
+            for (b = 0; b < M; b += 8) {
+                for (c = a; c < a + 4; ++c) {
+                    reg0 = A[c][b + 0];
+                    reg1 = A[c][b + 1];
+                    reg2 = A[c][b + 2];
+                    reg3 = A[c][b + 3];
+                    reg4 = A[c][b + 4];
+                    reg5 = A[c][b + 5];
+                    reg6 = A[c][b + 6];
+                    reg7 = A[c][b + 7];
+                    B[b + 0][c] = reg0;
+                    B[b + 0][c + 4] = reg4;
+                    B[b + 1][c] = reg1;
+                    B[b + 1][c + 4] = reg5;
+                    B[b + 2][c] = reg2;
+                    B[b + 2][c + 4] = reg6;
+                    B[b + 3][c] = reg3;
+                    B[b + 3][c + 4] = reg7;
+                }
+                for (c = 0; c < 4; ++c) {
+                    reg0 = A[a + 4][b + c];
+                    reg1 = A[a + 5][b + c];
+                    reg2 = A[a + 6][b + c];
+                    reg3 = A[a + 7][b + c];
+                    reg4 = B[b + c][a + 4];
+                    reg5 = B[b + c][a + 5];
+                    reg6 = B[b + c][a + 6];
+                    reg7 = B[b + c][a + 7];
+                    B[b + c][a + 4] = reg0;
+                    B[b + c][a + 5] = reg1;
+                    B[b + c][a + 6] = reg2;
+                    B[b + c][a + 7] = reg3;
+                    reg0 = A[a + 4][b + c + 4];
+                    reg1 = A[a + 5][b + c + 4];
+                    reg2 = A[a + 6][b + c + 4];
+                    reg3 = A[a + 7][b + c + 4];
+                    B[b + c + 4][a + 0] = reg4;
+                    B[b + c + 4][a + 4] = reg0;
+                    B[b + c + 4][a + 1] = reg5;
+                    B[b + c + 4][a + 5] = reg1;
+                    B[b + c + 4][a + 2] = reg6;
+                    B[b + c + 4][a + 6] = reg2;
+                    B[b + c + 4][a + 3] = reg7;
+                    B[b + c + 4][a + 7] = reg3;
+                }
+            }
+        }
+    } else if (M == 61 && N == 67) {
+        for (a = 0; a < N; a += 23)
+            for (b = 0;  b < M; b += 23)
+                for (c = a; c < a + 23 && c < N; ++c)
+                    for (d = b; d < b + 23 && d < M; ++d)
+                        B[d][c] = A[c][d];
+    }
+}
 ```
-
-验证结果，如所示：
-
-
 
 ## 实验结果和分析
 
+执行以下命令，重新生成目标文件：
 
+```c
+make clean
+make
+```
+
+执行32×32矩阵转置测试：
+
+```shell
+./test-trans -M 32 -N 32
+```
+
+执行结果如所示：
+
+![](./report_src/result_of_matrix_32_32.png)
+
+结果287小于300，满足条件。
+
+执行64×64矩阵测试：
+
+```shell
+./test-trans -M 64 -N 64
+```
+
+执行结果如所示：
+
+![](./report_src/result_of_matrix_64_64.png)
+
+结果1139小于1300，满足条件。
+
+执行61×67矩阵测试：
+
+```shell
+./test-trans -M 61 -N 67
+```
+
+执行结果如所示：
+
+![](./report_src/result_of_61_67.png)
+
+结果1985小于2000，满足条件。
 
 # 总结和体会
 
